@@ -86,6 +86,9 @@ var clearBalls = function() {
     for (i = 0; i < nums.length; i ++){
         clearInterval(nums[i]);
     }
+
+    balls = [];
+
     while (pic.firstChild) {
         pic.removeChild(pic.firstChild);
     }
