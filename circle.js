@@ -1,12 +1,15 @@
 //Caleb Smith-Salzberg, Vivien Lee
-//Team caLeeb 
+//Team caLeeb
 //SoftDev2 pd7
 //K11 -- All that Bouncin'
-//2018-03-08
+//2018-03-12
 var pic = document.getElementById("vimage");
 var btn = document.getElementById("clear");
+var balls = [];
+var nums = [];
 
 var initDotRad = 20;
+
 
 var clearRect = function() {
     var rect = document.createElementNS(
@@ -22,7 +25,7 @@ var clearRect = function() {
 };
 
 var draw = function(e) {
-    makeDot(e.offsetX, e.offsetY).display();
+    makeDot(Math.floor((Math.random() * 460)+20), Math.floor((Math.random() * 460)+20)).display();
 };
 
 var makeDot = function(x,y){
@@ -31,9 +34,12 @@ var makeDot = function(x,y){
     dot.setAttribute("cy",y);
     dot.setAttribute("r",initDotRad);
     dot.setAttribute("fill","red");
+    dot.setAttribute("vx",1);
+    dot.setAttribute("vy",1);
 
     dot.display = function() {
-	pic.appendChild(makeDot(x,y));    
+	     pic.appendChild(this);
+       balls.push(this);
     };
 
     dot.setx = function(x) {
@@ -52,25 +58,38 @@ var makeDot = function(x,y){
 	return dot.getAttribute("fill");
     };
 
-    dot.addEventListener("click", change, true);
+    dot.bounce = function(e) {
+       var x = parseInt(dot.getAttribute("cx"));
+       var y = parseInt(dot.getAttribute("cy"));
 
-    return dot;
+       if (x <= 20 || x >= 480){
+           dot.setAttribute("vx", dot.getAttribute("vx") * -1);
+       }
+
+       if (y <= 0 || y >= 480){
+         dot.setAttribute("vy", dot.getAttribute("vy") * -1);
+       }
+
+       dot.setx(x + parseInt(dot.getAttribute("vx")));
+       dot.sety(y + parseInt(dot.getAttribute("vy")));
+       dot.display();
+   };
+
+   var num = setInterval(dot.bounce, 10);
+   nums.push(num);
+   return dot;
+
 };
 
-var change = function(e) {
-    if (this.getcolor() == "red") {
-	console.log("green");
-	this.setcolor("green");
-	e.stopPropagation();
+var clearBalls = function() {
+    var i = 0;
+    for (i = 0; i < nums.length; i ++){
+        clearInterval(nums[i]);
     }
-    else if (this.getcolor() == "green") {
-	this.remove();
-	e.stopPropagation();
-	makeDot(Math.floor(Math.random() * pic.getAttribute("width")), Math.floor(Math.random() * pic.getAttribute("height"))).display();
+    while (pic.firstChild) {
+        pic.removeChild(pic.firstChild);
     }
 };
 
 pic.addEventListener("click", draw);
-btn.addEventListener("click", clearRect);
-
-
+btn.addEventListener("click", clearBalls);
